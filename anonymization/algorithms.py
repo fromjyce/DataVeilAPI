@@ -4,6 +4,8 @@ from faker import Faker
 fake = Faker()
 
 def anonymize_data(data, technique):
+    if not data:
+        return 'No data provided'
     if technique == 'masking':
         return data[:5] + '*****'
     elif technique == 'generalization':
