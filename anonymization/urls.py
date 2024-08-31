@@ -1,6 +1,6 @@
 from django.urls import path
-from .views import AnonymizeDataView
+from .views import anonymize_view
 
 urlpatterns = [
-    path('anonymize/', AnonymizeDataView.as_view(), name='anonymize_data'),
+    path('anonymize/', anonymize_view, name='anonymize'),
 ]
