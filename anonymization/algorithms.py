@@ -40,11 +40,11 @@ def perturb_data(data):
     elif re.match(r'\d+', data):
         return perturb_number(data)
     else:
-        return 'Unsupported data format'
+        return data  # Leave unchanged if unsupported format
     
 def pseudonymize_data(data):
     if re.match(r'[^@]+@[^@]+\.[^@]+', data):
-            return fake.email()
+        return fake.email()
     elif re.match(r'^[A-Za-z\s]+$', data):
         return fake.name()
     elif re.match(r'\+?\d[\d\-\(\) ]{4,}\d', data):
@@ -75,26 +75,37 @@ def generate_synthetic_data(data):
     else:
         return ' '.join(fake.words(nb=length // 5 + 1))[:length]
 
-
 def anonymize_data(data, technique):
     if not data:
         return 'No data provided'
+    
     segments = [segment.strip() for segment in re.split(r',\s*', data)]
     anonymized_segments = []
+    
     for segment in segments:
         if technique == 'masking':
-            anonymized_segments.append(
-                apply_masking(segment, r'^[A-Za-z\s]+$', lambda m: m.group(0)[0] + '*'*(len(m.group(0)) - 2) + m.group(0)[-1]) or
-                apply_masking(segment, r'[^@]+@[^@]+\.[^@]+', lambda m: m.group(0)[0] + '*'*(len(m.group(0).split('@')[0]) - 1) + '@' + m.group(0).split('@')[1]) or
-                apply_masking(segment, r'\+?\d[\d\-\(\) ]{4,}\d', lambda m: m.group(0)[:len(m.group(0)) - 4] + '*'*4) or
-                apply_masking(segment, r'\d{4} \d{4} \d{4} \d{4}', lambda m: '**** **** **** ' + m.group(0)[-4:]) or
-                apply_masking(segment, r'\d+', lambda m: '*'*(len(m.group(0)) - 4) + m.group(0)[-4:]) or
-                apply_masking(segment, r'\d{12}', lambda m: '**** **** **** ' + m.group(0)[-4:]) or
-                apply_masking(segment, r'[A-Z]{2}\d+', lambda m: '*'*(len(m.group(0)) - 4) + m.group(0)[-4:]) or
-                apply_masking(segment, r'[A-Z]{3}\d+', lambda m: '***' + m.group(0)[-7:]) or
-                apply_masking(segment, r'[A-Z]{5}\d{4}[A-Z]', lambda m: '*'*5 + m.group(0)[-4:]) or
-                apply_masking(segment, r'[A-Z]\d{7}', lambda m: '*'*3 + m.group(0)[-7:])
-            )
+            masked = apply_masking(segment, r'^[A-Za-z\s]+$', lambda m: m.group(0)[0] + '*'*(len(m.group(0)) - 2) + m.group(0)[-1])
+            if masked != segment:
+                anonymized_segments.append(masked)
+                continue
+
+            masked = apply_masking(segment, r'[^@]+@[^@]+\.[^@]+', lambda m: m.group(0)[0] + '*'*(len(m.group(0).split('@')[0]) - 1) + '@' + m.group(0).split('@')[1])
+            if masked != segment:
+                anonymized_segments.append(masked)
+                continue
+
+            masked = apply_masking(segment, r'\+?\d[\d\-\(\) ]{4,}\d', lambda m: m.group(0)[:len(m.group(0)) - 4] + '*'*4)
+            if masked != segment:
+                anonymized_segments.append(masked)
+                continue
+
+            masked = apply_masking(segment, r'\d+', lambda m: '*'*(len(m.group(0)) - 4) + m.group(0)[-4:])
+            if masked != segment:
+                anonymized_segments.append(masked)
+                continue
+
+            anonymized_segments.append(segment)
+
         elif technique == 'generalization':
             anonymized_segments.append(generalize_data(segment))
         elif technique == 'randomization':
