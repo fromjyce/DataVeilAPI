@@ -6,10 +6,23 @@ class DataSerializer(serializers.ModelSerializer):
         model = Data
         fields = '__all__'
 
+ANONYMIZATION_TECHNIQUES = (
+    ('masking', 'Masking'),
+    ('generalization', 'Generalization'),
+    ('k-anonymity', 'K-Anonymity'),
+    ('randomization', 'Randomization'),
+    ('aggregation', 'Aggregation'),
+    ('perturbation', 'Perturbation'),
+    ('pseudonymization', 'Pseudonymization'),
+    ('data_swapping', 'Data Swapping'),
+    ('synthetic_data', 'Synthetic Data'),
+)
+
 class AnonymizationSerializer(serializers.Serializer):
-    data = serializers.CharField()
-    technique = serializers.ChoiceField(choices=[
-        'masking', 'generalization', 'k-anonymity', 'randomization',
-        'aggregation', 'perturbation', 'pseudonymization', 'data_swapping',
-        'synthetic_data'
-    ])
+    data = serializers.CharField(required=True)
+    technique = serializers.ChoiceField(choices=ANONYMIZATION_TECHNIQUES, required=True)
+
+    def validate_data(self, value):
+        if not value.strip():
+            raise serializers.ValidationError("Data cannot be empty or just whitespace.")
+        return value
