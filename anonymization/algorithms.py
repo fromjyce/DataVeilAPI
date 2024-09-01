@@ -79,37 +79,35 @@ def generate_synthetic_data(data):
 def anonymize_data(data, technique):
     if not data:
         return 'No data provided'
-
-    if technique == 'masking':
-        data = apply_masking(data, r'^[A-Za-z\s]+$', lambda m: m.group(0)[0] + '*'*(len(m.group(0)) - 2) + m.group(0)[-1])
-        data = apply_masking(data, r'[^@]+@[^@]+\.[^@]+', lambda m: m.group(0)[0] + '*'*(len(m.group(0).split('@')[0]) - 1) + '@' + m.group(0).split('@')[1])
-        data = apply_masking(data, r'\+?\d[\d\-\(\) ]{4,}\d', lambda m: m.group(0)[:len(m.group(0)) - 4] + '*'*4)
-        data = apply_masking(data, r'\d{4} \d{4} \d{4} \d{4}', lambda m: '**** **** **** ' + m.group(0)[-4:])
-        data = apply_masking(data, r'\d+', lambda m: '*'*(len(m.group(0)) - 4) + m.group(0)[-4:])
-        data = apply_masking(data, r'\d{12}', lambda m: '**** **** **** ' + m.group(0)[-4:])
-        data = apply_masking(data, r'[A-Z]{2}\d+', lambda m: '*'*(len(m.group(0)) - 4) + m.group(0)[-4:])
-        data = apply_masking(data, r'[A-Z]{3}\d+', lambda m: '***' + m.group(0)[-7:])
-        data = apply_masking(data, r'[A-Z]{5}\d{4}[A-Z]', lambda m: '*'*5 + m.group(0)[-4:])
-        data = apply_masking(data, r'[A-Z]\d{7}', lambda m: '*'*3 + m.group(0)[-7:])
-        return data
-
-    elif technique == 'generalization':
-        return generalize_data(data)
-
-    elif technique == 'randomization':
-        return randomize_data(data)
-
-    elif technique == 'perturbation':
-        return perturb_data(data)
-
-    elif technique == 'pseudonymization':
-        return pseudonymize_data(data)
-
-    elif technique == 'data_swapping':
-        return swap_data(data)
-
-    elif technique == 'synthetic_data':
-        return generate_synthetic_data(data)
-
-    else:
-        return data
+    segments = [segment.strip() for segment in re.split(r',\s*', data)]
+    anonymized_segments = []
+    for segment in segments:
+        if technique == 'masking':
+            anonymized_segments.append(
+                apply_masking(segment, r'^[A-Za-z\s]+$', lambda m: m.group(0)[0] + '*'*(len(m.group(0)) - 2) + m.group(0)[-1]) or
+                apply_masking(segment, r'[^@]+@[^@]+\.[^@]+', lambda m: m.group(0)[0] + '*'*(len(m.group(0).split('@')[0]) - 1) + '@' + m.group(0).split('@')[1]) or
+                apply_masking(segment, r'\+?\d[\d\-\(\) ]{4,}\d', lambda m: m.group(0)[:len(m.group(0)) - 4] + '*'*4) or
+                apply_masking(segment, r'\d{4} \d{4} \d{4} \d{4}', lambda m: '**** **** **** ' + m.group(0)[-4:]) or
+                apply_masking(segment, r'\d+', lambda m: '*'*(len(m.group(0)) - 4) + m.group(0)[-4:]) or
+                apply_masking(segment, r'\d{12}', lambda m: '**** **** **** ' + m.group(0)[-4:]) or
+                apply_masking(segment, r'[A-Z]{2}\d+', lambda m: '*'*(len(m.group(0)) - 4) + m.group(0)[-4:]) or
+                apply_masking(segment, r'[A-Z]{3}\d+', lambda m: '***' + m.group(0)[-7:]) or
+                apply_masking(segment, r'[A-Z]{5}\d{4}[A-Z]', lambda m: '*'*5 + m.group(0)[-4:]) or
+                apply_masking(segment, r'[A-Z]\d{7}', lambda m: '*'*3 + m.group(0)[-7:])
+            )
+        elif technique == 'generalization':
+            anonymized_segments.append(generalize_data(segment))
+        elif technique == 'randomization':
+            anonymized_segments.append(randomize_data(segment))
+        elif technique == 'perturbation':
+            anonymized_segments.append(perturb_data(segment))
+        elif technique == 'pseudonymization':
+            anonymized_segments.append(pseudonymize_data(segment))
+        elif technique == 'data_swapping':
+            anonymized_segments.append(swap_data(segment))
+        elif technique == 'synthetic_data':
+            anonymized_segments.append(generate_synthetic_data(segment))
+        else:
+            anonymized_segments.append(segment)
+    
+    return ', '.join(anonymized_segments)
