@@ -11,7 +11,6 @@ ANONYMIZATION_TECHNIQUES = (
     ('generalization', 'Generalization'),
     ('k-anonymity', 'K-Anonymity'),
     ('randomization', 'Randomization'),
-    ('aggregation', 'Aggregation'),
     ('perturbation', 'Perturbation'),
     ('pseudonymization', 'Pseudonymization'),
     ('data_swapping', 'Data Swapping'),
