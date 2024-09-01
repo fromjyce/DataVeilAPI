@@ -59,9 +59,33 @@ def pseudonymize_data(data):
         return fake.sentence()
     
 def swap_data(data):
-    data_list = data.split()
-    random.shuffle(data_list)
-    return ' '.join(data_list)
+    if re.match(r'^[A-Za-z\s]+$', data):
+        parts = data.split()
+        random.shuffle(parts)
+        return ' '.join(parts)
+    elif re.match(r'[^@]+@[^@]+\.[^@]+', data):
+        user, domain = data.split('@')
+        user = ''.join(random.sample(user, len(user)))
+        return f'{user}@{domain}'
+    elif re.match(r'\d{4} \d{4} \d{4} \d{4}', data):
+        parts = data.split()
+        random.shuffle(parts)
+        return ' '.join(parts)
+    elif re.match(r'\d{12}', data):
+        parts = [data[i:i+4] for i in range(0, len(data), 4)]
+        random.shuffle(parts)
+        return ''.join(parts)
+    elif re.match(r'\d{4} \d{4} \d{4}', data):
+        parts = data.split()
+        random.shuffle(parts)
+        return ' '.join(parts)
+    elif re.match(r'[A-Z]\d{7}', data):
+        prefix = data[0]
+        numbers = list(data[1:])
+        random.shuffle(numbers)
+        return prefix + ''.join(numbers)
+    else:
+        return data
 
 def generate_synthetic_data(data):
     length = len(data)
