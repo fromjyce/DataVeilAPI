@@ -14,6 +14,7 @@ ANONYMIZATION_TECHNIQUES = (
     ('perturbation', 'Perturbation'),
     ('pseudonymization', 'Pseudonymization'),
     ('data_swapping', 'Data Swapping'),
+    ('synthetic_data', 'Synthetic Data'),
 )
 
 class AnonymizationSerializer(serializers.Serializer):
