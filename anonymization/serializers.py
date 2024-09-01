@@ -8,7 +8,7 @@ class DataSerializer(serializers.ModelSerializer):
 
 ANONYMIZATION_TECHNIQUES = (
     ('masking', 'Masking'),
-    ('k-anonymity', 'K-Anonymity'),
+    ('generalization', 'Generalization'),
     ('randomization', 'Randomization'),
     ('perturbation', 'Perturbation'),
     ('pseudonymization', 'Pseudonymization'),
