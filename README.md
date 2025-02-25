@@ -24,7 +24,7 @@
 1. Clone the repository:
 
     ```bash
-    git clone https://github.com/yourusername/DataVeilAPI.git
+    git clone https://github.com/fromjyce/DataVeilAPI.git
     cd DataVeilAPI
     ```
 
